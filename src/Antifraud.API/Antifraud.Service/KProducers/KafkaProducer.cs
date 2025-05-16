@@ -14,11 +14,11 @@ namespace Antifraud.Service.KProducers
     {
         private readonly IProducer<string, string> _producer;
 
-        public KafkaProducer(IOptions<AppSettings> settings)
+        public KafkaProducer(IOptions<KafkaSettings> kafkaSettings)
         {
             var config = new ProducerConfig
             {
-                BootstrapServers = settings.Value.BootstrapServers,
+                BootstrapServers = kafkaSettings.Value.BootstrapServers,
             };
 
             _producer = new ProducerBuilder<string, string>(config).Build();

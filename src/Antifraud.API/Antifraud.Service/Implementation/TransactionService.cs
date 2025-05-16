@@ -1,4 +1,5 @@
-﻿using Antifraud.Dto;
+﻿using Antifraud.Common.Settings;
+using Antifraud.Dto;
 using Antifraud.Model;
 using Antifraud.Repository.Interface;
 using Antifraud.Service.Interface;
@@ -6,6 +7,7 @@ using Antifraud.Service.KProducers;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.Transactions;
 
@@ -18,20 +20,22 @@ public class TransactionService : ITransactionService
     private readonly ITransactionEventRepository _transactionEvent;
     private readonly ILogger<TransactionService> _logger;
     private readonly IKafkaProducer _kafkaProducer;
-
+    private readonly KafkaSettings _kafkaSettings;
 
     public TransactionService(IValidator<TransactionModel> transactionValidator,
                               ITransactionRepository transactionRepository,
                               ITransactionEventRepository transactionEvent,
                               ILogger<TransactionService> logger,
-                              IKafkaProducer kafkaProducer
+                              IKafkaProducer kafkaProducer,
+                              IOptions<KafkaSettings> kafkaSettings
                               )
     {
         _transactionValidator = transactionValidator;
         _transactionRepository = transactionRepository ?? throw new ArgumentNullException(nameof(transactionRepository));
         _transactionEvent = transactionEvent ?? throw new ArgumentNullException(nameof(transactionEvent));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _kafkaProducer = kafkaProducer ?? throw new ArgumentNullException(nameof(_kafkaProducer));
+        _kafkaProducer = kafkaProducer ?? throw new ArgumentNullException(nameof(kafkaProducer));
+        _kafkaSettings = kafkaSettings.Value ?? throw new ArgumentNullException(nameof(kafkaSettings));
     }
 
     public async Task<TransactionEventModel> CreateTransaction(TransactionModel transaction)
@@ -46,7 +50,7 @@ public class TransactionService : ITransactionService
                 await RegisterTransaction(transaction);
                 var eventInformation = await RegisterEventTransaction(transaction.TransactionId);
 
-                await _kafkaProducer.PublishAsync("transactions", new TransactionEventKafkaDto
+                await _kafkaProducer.PublishAsync(_kafkaSettings.TransactionsTopic, new TransactionEventKafkaDto
                 {
                     EventId = eventInformation.EventId,
                     TransactionId = eventInformation.TransactionId,

@@ -38,21 +38,28 @@ namespace Antifraud.Repository.Implementation
             return await ExecuteAsync(command, parameters);
         }
 
-        public async Task<IEnumerable<TransactionEventModel>> GetTransactionEvent(Guid eventId)
+        public async Task<TransactionEventModel> GetTransactionEvent(Guid eventId)
         {
             var parameters = new { eventId };
 
             var command = @"SELECT event_id, transaction_id, status, is_processed, created_at FROM transaction_events
                             WHERE event_id = @eventId";
 
-            return await QueryAsync(command, parameters);
+            return await QueryFirstOrDefaultAsync(command, parameters);
         }
 
         public async Task<bool> UpdateTransactionEvent(TransactionEventModel transactionLog)
         {
-            var parameters = new {transactionLog.EventId, transactionLog.TransactionId, transactionLog.Status, transactionLog.IsProcessed };
+            var parameters = new
+            {
+                transactionLog.EventId,
+                transactionLog.TransactionId,
+                transactionLog.Status,
+                transactionLog.IsProcessed,
+                transactionLog.Messages,
+            };
 
-            var command = @"UPDATE transaction_events SET status = @Status, is_processed = @IsProcessed
+            var command = @"UPDATE transaction_events SET status = @Status, is_processed = @IsProcessed, messages = @Messages
                             WHERE event_id = @EventId and transaction_id = @TransactionId";
 
             return await ExecuteAsync(command, parameters) > 0;
