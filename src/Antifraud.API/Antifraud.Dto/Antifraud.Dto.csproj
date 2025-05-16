@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Antifraud.Common\Antifraud.Common.csproj" />
+  </ItemGroup>
+
 </Project>

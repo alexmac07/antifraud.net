@@ -1,5 +1,8 @@
 
-namespace Transaction.API
+using Antifraud.Service.Extensions;
+using Antifraud.Service.KConsumers;
+
+namespace Transaction.Api
 {
     public class Program
     {
@@ -13,6 +16,9 @@ namespace Transaction.API
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddServices(builder.Configuration);
+            builder.Services.AddHostedService<KafkaTransactionConsumer>();
 
             var app = builder.Build();
 
