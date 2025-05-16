@@ -4,6 +4,7 @@ using Antifraud.Repository.Implementation;
 using Antifraud.Repository.Interface;
 using Antifraud.Service.Implementation;
 using Antifraud.Service.Interface;
+using Antifraud.Service.KConsumers;
 using Antifraud.Service.KProducers;
 using Antifraud.Service.Validator;
 using FluentValidation;
@@ -18,6 +19,9 @@ public static class ServiceExtensions
     {
         // .: Settings and Configurations
         services.Configure<AppSettings>(configuration.GetSection("AppSettings"));
+        services.Configure<KafkaSettings>(configuration.GetSection("KafkaSettings"));
+        services.AddHostedService<KafkaConsumer>();
+
 
         // .: Utilities :.
         services.AddSingleton<IKafkaProducer, KafkaProducer>();

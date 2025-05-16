@@ -8,7 +8,7 @@ namespace Antifraud.Repository.Interface
 
         Task<bool> UpdateTransactionEvent(TransactionEventModel transactionLog);
 
-        Task<IEnumerable<TransactionEventModel>> GetTransactionEvent(Guid eventId);
+        Task<TransactionEventModel> GetTransactionEvent(Guid eventId);
 
     }
 }

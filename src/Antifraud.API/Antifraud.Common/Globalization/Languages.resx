@@ -129,10 +129,19 @@
   <data name="ParameterRequired" xml:space="preserve">
     <value>El parámetro {0} es requerido.</value>
   </data>
+  <data name="RejectionInvalidTransaction" xml:space="preserve">
+    <value>La transacción proporcionada es inválida y no puede ser procesada.</value>
+  </data>
   <data name="RejectionMaxTransactionAllowed" xml:space="preserve">
     <value>El acumulado en transacciones por día excede el límite permitido.</value>
   </data>
   <data name="RejectionMaxValueExceeded" xml:space="preserve">
     <value>El monto de la transacción no puede ser mayor a 2,000.</value>
+  </data>
+  <data name="TransactionEventNotFound" xml:space="preserve">
+    <value>No se ha encontrado un evento con los parámetros proporcionados.</value>
+  </data>
+  <data name="TransactionNotFound" xml:space="preserve">
+    <value>No se ha encontrado la transaccion con los parámetros especificados.</value>
   </data>
 </root>
