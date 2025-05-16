@@ -1,4 +1,4 @@
-namespace Transaction.API
+namespace Transaction.Api
 {
     public class WeatherForecast
     {

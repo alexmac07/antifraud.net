@@ -3,6 +3,7 @@
 public class TransactionResult
 {
     public Guid TransactionId { get; set; }
+    public Guid EventId { get; set; }
     public bool Success { get; set; }
     public string? ErrorMessage { get; set; }
     public static TransactionResult Ok() => new() { Success = true };

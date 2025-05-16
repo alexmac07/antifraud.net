@@ -1,4 +1,5 @@
 ﻿using Antifraud.Common.Settings;
+using Antifraud.Dto;
 using Antifraud.Model;
 using Antifraud.Repository.Implementation;
 using Antifraud.Repository.Interface;
@@ -20,19 +21,19 @@ public static class ServiceExtensions
         // .: Settings and Configurations
         services.Configure<AppSettings>(configuration.GetSection("AppSettings"));
         services.Configure<KafkaSettings>(configuration.GetSection("KafkaSettings"));
-        services.AddHostedService<KafkaConsumer>();
+        
 
 
         // .: Utilities :.
         services.AddSingleton<IKafkaProducer, KafkaProducer>();
         services.AddSingleton<IValidator<TransactionModel>, TransactionValidator>();
+        services.AddSingleton<IValidator<TransactionResult>, TransactionResultValidator>();
 
         // .: Repository Layer :.
         services.AddScoped<ITransactionRepository, TransactionRepository>();
         services.AddScoped<ITransactionEventRepository, TransactionEventRepository>();
 
-        // .: Service Layer :.
-        services.AddScoped<ITransactionService, TransactionService>();
+
         services.AddScoped<IAntifraudService, AntifraudService>();
 
 

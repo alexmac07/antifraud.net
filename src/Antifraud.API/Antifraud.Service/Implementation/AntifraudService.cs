@@ -19,6 +19,7 @@ namespace Antifraud.Service.Implementation
             TransactionEventModel? eventInformation = new TransactionEventModel();
             var transactionResult = new TransactionResult();
             transactionResult.TransactionId = transactionId;
+            transactionResult.EventId = eventId;
 
             while (true)
             {
