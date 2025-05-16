@@ -1,4 +1,6 @@
-﻿using Antifraud.Common.Settings;
+﻿using Antifraud.Common.Constant;
+using Antifraud.Common.Globalization;
+using Antifraud.Common.Settings;
 using Antifraud.Dto;
 using Antifraud.Model;
 using Antifraud.Repository.Interface;
@@ -16,6 +18,7 @@ namespace Antifraud.Service.Implementation;
 public class TransactionService : ITransactionService
 {
     private readonly IValidator<TransactionModel> _transactionValidator;
+    private readonly IValidator<TransactionResult> _transactionResultValidator;
     private readonly ITransactionRepository _transactionRepository;
     private readonly ITransactionEventRepository _transactionEvent;
     private readonly ILogger<TransactionService> _logger;
@@ -23,6 +26,7 @@ public class TransactionService : ITransactionService
     private readonly KafkaSettings _kafkaSettings;
 
     public TransactionService(IValidator<TransactionModel> transactionValidator,
+                              IValidator<TransactionResult> transactionResultValidator,
                               ITransactionRepository transactionRepository,
                               ITransactionEventRepository transactionEvent,
                               ILogger<TransactionService> logger,
@@ -30,7 +34,8 @@ public class TransactionService : ITransactionService
                               IOptions<KafkaSettings> kafkaSettings
                               )
     {
-        _transactionValidator = transactionValidator;
+        _transactionValidator = transactionValidator ?? throw new ArgumentNullException(nameof(transactionValidator));
+        _transactionResultValidator = transactionResultValidator ?? throw new ArgumentNullException(nameof(transactionResultValidator));
         _transactionRepository = transactionRepository ?? throw new ArgumentNullException(nameof(transactionRepository));
         _transactionEvent = transactionEvent ?? throw new ArgumentNullException(nameof(transactionEvent));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -57,15 +62,42 @@ public class TransactionService : ITransactionService
                 });
 
                 tsn.Complete();
+                return eventInformation;
             }
 
         }
-        return default;
+        throw new ValidationException(vResult.Errors);
     }
 
-    public Task<TransactionModel> UpdateTransaction(TransactionEventModel transactionEvent)
+    public async Task<TransactionModel> UpdateTransaction(TransactionResult transactionResult)
     {
-        throw new NotImplementedException();
+        ValidationResult vResult = _transactionResultValidator.Validate(transactionResult);
+        if (vResult.IsValid)
+        {
+            // retrieve event trasction information
+            var eventInformation = await _transactionEvent.GetTransactionEvent(transactionResult.EventId);
+            var transactionInformation = await _transactionRepository.SearchTransaction(transactionResult.TransactionId);
+
+            if (eventInformation != null
+                && eventInformation.IsProcessed == true)
+            {
+                if (transactionInformation != null)
+                {
+                    transactionInformation.Status = eventInformation.Status;
+                    await _transactionRepository.UpdateTransaction(transactionInformation);
+                    return transactionInformation;
+                }
+                else
+                {
+                    throw new Exception(Languages.TransactionNotFound);
+                }
+            }
+            else
+            {
+                throw new Exception(Languages.TransactionEventNotFound);
+            }
+        }
+        throw new ValidationException(vResult.Errors);
     }
 
 

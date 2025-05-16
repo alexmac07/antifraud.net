@@ -1,4 +1,5 @@
-﻿using Antifraud.Model;
+﻿using Antifraud.Dto;
+using Antifraud.Model;
 
 namespace Antifraud.Service.Interface;
 
@@ -12,9 +13,9 @@ public interface ITransactionService
     Task<TransactionEventModel> CreateTransaction(TransactionModel transaction);
 
     /// <summary>
-    /// Updates a transaction given a event.
+    /// Updates a transaction given a antifraud transaction result.
     /// </summary>
-    /// <param name="transactionEvent">Event related to transaction.</param>
+    /// <param name="transactionEvent">Result related to transaction.</param>
     /// <returns></returns>
-    Task<TransactionModel> UpdateTransaction(TransactionEventModel transactionEvent);
+    Task<TransactionModel> UpdateTransaction(TransactionResult transactionResult);
 }
