@@ -3,6 +3,5 @@
     public class AppSettings
     {
         public string DBConnection { get; set; }
-        public string BootstrapServers { get; set; }
     }
 }

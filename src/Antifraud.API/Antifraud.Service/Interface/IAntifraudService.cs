@@ -1,4 +1,6 @@
-﻿namespace Antifraud.Service.Interface;
+﻿using Antifraud.Dto;
+
+namespace Antifraud.Service.Interface;
 
 public interface IAntifraudService
 {
@@ -6,6 +8,7 @@ public interface IAntifraudService
     /// Antifraud transaction verification service.
     /// </summary>
     /// <param name="eventId">Unique identifier of the event related to the transaction.</param>
+    /// <param name="transactionId">Unique identifier of the transaction.</param>
     /// <returns></returns>
-    Task<bool> VerifyTransaction(Guid eventId);
+    Task<TransactionResult> VerifyTransaction(Guid eventId, Guid transactionId);
 }

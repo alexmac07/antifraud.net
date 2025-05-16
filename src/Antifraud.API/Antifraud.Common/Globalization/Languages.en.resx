@@ -129,10 +129,19 @@
   <data name="ParameterRequired" xml:space="preserve">
     <value>Parameter {0} is required.</value>
   </data>
+  <data name="RejectionInvalidTransaction" xml:space="preserve">
+    <value>Provided transaction is invalid and will not be procesed.</value>
+  </data>
   <data name="RejectionMaxTransactionAllowed" xml:space="preserve">
     <value>The accumulated transactions per day exceed the allowed limit.</value>
   </data>
   <data name="RejectionMaxValueExceeded" xml:space="preserve">
     <value>Transaction amount exceeds maximum allowed of 2,000.</value>
+  </data>
+  <data name="TransactionEventNotFound" xml:space="preserve">
+    <value>No event transaction was found given those parameters.</value>
+  </data>
+  <data name="TransactionNotFound" xml:space="preserve">
+    <value>No transaction was found given those parameters.</value>
   </data>
 </root>

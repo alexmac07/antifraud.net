@@ -97,6 +97,15 @@ namespace Antifraud.Common.Globalization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a La transacción proporcionada es inválida y no puede ser procesada..
+        /// </summary>
+        public static string RejectionInvalidTransaction {
+            get {
+                return ResourceManager.GetString("RejectionInvalidTransaction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a El acumulado en transacciones por día excede el límite permitido..
         /// </summary>
         public static string RejectionMaxTransactionAllowed {
@@ -111,6 +120,24 @@ namespace Antifraud.Common.Globalization {
         public static string RejectionMaxValueExceeded {
             get {
                 return ResourceManager.GetString("RejectionMaxValueExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a No se ha encontrado un evento con los parámetros proporcionados..
+        /// </summary>
+        public static string TransactionEventNotFound {
+            get {
+                return ResourceManager.GetString("TransactionEventNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a No se ha encontrado la transaccion con los parámetros especificados..
+        /// </summary>
+        public static string TransactionNotFound {
+            get {
+                return ResourceManager.GetString("TransactionNotFound", resourceCulture);
             }
         }
     }
