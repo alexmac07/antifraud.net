@@ -15,6 +15,13 @@ namespace Antifraud.Repository.Implementation
         {
         }
 
+        public async Task<bool> DeleteTransaction(Guid transactionId)
+        {
+            var parameters = new { transactionId };
+            var command = @"DELETE FROM transact.transactions WHERE transaction_id = @transactionId";
+            return await ExecuteAsync(command, parameters) > 0;
+        }
+
         public async Task<int> RegisterTransaction(TransactionModel transaction)
         {
             var parameters = new
@@ -25,10 +32,10 @@ namespace Antifraud.Repository.Implementation
                 transaction.TransferType,
                 transaction.Value,
                 transaction.Status,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTimeOffset.Now.ToUniversalTime()
             };
 
-            var command = @"INSERT INTO transactions(transaction_id, source_account_id, target_account_id, transfer_type, value, status, created_at)
+            var command = @"INSERT INTO transact.transactions(transaction_id, source_account_id, target_account_id, transfer_type, value, status, created_at)
                             values
                             (
                             @TransactionId,
@@ -46,8 +53,8 @@ namespace Antifraud.Repository.Implementation
         {
             var parameters = new { transactionId, createdAt };
 
-            var command = @"SELECT transaction_id, source_account_id, target_account_id, transfer_type, value, status, created_at from transactions
-                            WHERE transaction_id = @transactionId and created_at = @createdAt";
+            var command = $@"SELECT transaction_id, source_account_id, target_account_id, transfer_type, value, status, created_at from transact.transactions
+                            WHERE transaction_id = @transactionId {(createdAt != null ? "and created_at = @createdAt" : "")}";
 
             return await QueryFirstOrDefaultAsync(command, parameters);
         }
@@ -56,10 +63,10 @@ namespace Antifraud.Repository.Implementation
         {
             var searchCommand = DefineAccountPointer(accountPointer);
 
-            var parameters = new { searchCommand, accountId };
+            var parameters = new { accountId };
 
-            var command = @"SELECT transaction_id, source_account_id, target_account_id, transfer_type, value, status, created_at from transactions
-                            WHERE @searchCommand = @accountId";
+            var command = $@"SELECT transaction_id, source_account_id, target_account_id, transfer_type, value, status, created_at from transact.transactions
+                            WHERE {searchCommand} = @accountId";
             return await QueryAsync(command, parameters);
         }
 
@@ -67,7 +74,7 @@ namespace Antifraud.Repository.Implementation
         {
             var parameters = new { transaction.TransactionId, transaction.Status };
 
-            var command = @"UPDATE transactions SET status = @Status WHERE transaction_id = @TransactionId";
+            var command = @"UPDATE transact.transactions SET status = @Status WHERE transaction_id = @TransactionId";
 
             return await ExecuteAsync(command, parameters) > 0;
         }

@@ -34,5 +34,12 @@ namespace Antifraud.Repository.Interface
         /// <param name="transaction">Transaction model</param>
         /// <returns></returns>
         Task<bool> UpdateTransaction(TransactionModel transaction);
+
+        
+        /// Deletes a transaction from the database.
+        /// </summary>
+        /// <param name="transactionId">The unique identifier of the transaction to delete.</param>
+        /// <returns>True if the transaction was successfully deleted; otherwise, false.</returns>
+        Task<bool> DeleteTransaction(Guid transactionId);
     }
 }

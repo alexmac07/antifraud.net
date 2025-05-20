@@ -32,10 +32,5 @@ public static class ServiceExtensions
         // .: Repository Layer :.
         services.AddScoped<ITransactionRepository, TransactionRepository>();
         services.AddScoped<ITransactionEventRepository, TransactionEventRepository>();
-
-
-        services.AddScoped<IAntifraudService, AntifraudService>();
-
-
     }
 }

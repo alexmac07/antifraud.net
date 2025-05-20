@@ -6,7 +6,6 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Npgsql;
 using System.Data;
-using System.Text.Json.Serialization;
 
 namespace Antifraud.Core.Repository.Implementation
 {
@@ -66,7 +65,7 @@ namespace Antifraud.Core.Repository.Implementation
             {
                 using (IDbConnection conn = Connection)
                 {
-                    return await conn.QueryFirstOrDefaultAsync(query, parameters);
+                    return await conn.QueryFirstOrDefaultAsync<T>(query, parameters);
                 }
             }
             catch (Exception ex)
@@ -75,5 +74,6 @@ namespace Antifraud.Core.Repository.Implementation
                 throw;
             }
         }
+
     }
 }

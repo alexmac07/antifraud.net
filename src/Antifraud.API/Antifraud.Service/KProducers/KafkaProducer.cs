@@ -34,7 +34,8 @@ namespace Antifraud.Service.KProducers
                 Value = JsonConvert.SerializeObject(sObject)
             };
 
-            await _producer.ProduceAsync(topic, kafkaMessage);
+            var result = await _producer.ProduceAsync(topic, kafkaMessage);
+            Console.WriteLine($"Connected: {result.TopicPartitionOffset}");
         }
     }
 

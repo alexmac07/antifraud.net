@@ -22,10 +22,10 @@ namespace Antifraud.Repository.Implementation
                 transactionLog.TransactionId,
                 transactionLog.Status,
                 transactionLog.IsProcessed,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTimeOffset.Now.ToUniversalTime()
             };
 
-            var command = @"INSERT INTO transaction_events (event_id, transaction_id, status, is_processed, created_at)
+            var command = @"INSERT INTO transact.transaction_events (event_id, transaction_id, status, is_processed, created_at)
                             VALUES
                             (
                             @EventId,
@@ -38,11 +38,18 @@ namespace Antifraud.Repository.Implementation
             return await ExecuteAsync(command, parameters);
         }
 
+        public async Task<bool> DeleteTransactionEvent(Guid eventId)
+        {
+            var parameters = new { eventId };
+            var command = @"DELETE FROM transact.transaction_events WHERE event_id = @eventId";
+            return await ExecuteAsync(command, parameters) > 0;
+        }
+
         public async Task<TransactionEventModel> GetTransactionEvent(Guid eventId)
         {
             var parameters = new { eventId };
 
-            var command = @"SELECT event_id, transaction_id, status, is_processed, created_at FROM transaction_events
+            var command = @"SELECT event_id, transaction_id, status, is_processed, created_at FROM transact.transaction_events
                             WHERE event_id = @eventId";
 
             return await QueryFirstOrDefaultAsync(command, parameters);
@@ -59,7 +66,7 @@ namespace Antifraud.Repository.Implementation
                 transactionLog.Messages,
             };
 
-            var command = @"UPDATE transaction_events SET status = @Status, is_processed = @IsProcessed, messages = @Messages
+            var command = @"UPDATE transact.transaction_events SET status = @Status, is_processed = @IsProcessed, messages = @Messages
                             WHERE event_id = @EventId and transaction_id = @TransactionId";
 
             return await ExecuteAsync(command, parameters) > 0;

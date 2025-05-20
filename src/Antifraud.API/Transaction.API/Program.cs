@@ -1,5 +1,7 @@
 
 using Antifraud.Service.Extensions;
+using Antifraud.Service.Implementation;
+using Antifraud.Service.Interface;
 using Antifraud.Service.KConsumers;
 
 namespace Transaction.Api
@@ -18,16 +20,13 @@ namespace Transaction.Api
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddServices(builder.Configuration);
-            builder.Services.AddHostedService<KafkaTransactionConsumer>();
-
+            builder.Services.AddScoped<ITransactionService, TransactionService>();
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+
+            app.UseSwagger();
+            app.UseSwaggerUI();
+
 
             app.UseHttpsRedirection();
 

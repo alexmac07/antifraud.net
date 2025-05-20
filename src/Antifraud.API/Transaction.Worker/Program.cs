@@ -3,7 +3,7 @@ using Antifraud.Service.Implementation;
 using Antifraud.Service.Interface;
 using Antifraud.Service.KConsumers;
 
-namespace Antifraud.Worker
+namespace Transaction.Worker
 {
     public class Program
     {
@@ -11,9 +11,9 @@ namespace Antifraud.Worker
         {
             var builder = Host.CreateApplicationBuilder(args);
             builder.Services.AddServices(builder.Configuration);
-            builder.Services.AddScoped<IAntifraudService, AntifraudService>();
-            builder.Services.AddHostedService<KafkaAntiFraudConsumer>();
- 
+            builder.Services.AddScoped<ITransactionService, TransactionService>();
+            builder.Services.AddHostedService<KafkaTransactionConsumer>();
+
             var host = builder.Build();
             host.Run();
         }

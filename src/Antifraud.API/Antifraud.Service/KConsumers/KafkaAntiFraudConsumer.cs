@@ -16,10 +16,7 @@ namespace Antifraud.Service.KConsumers
     {
         private readonly IKafkaProducer _kafkaProducer;
         private readonly IServiceScopeFactory _scopeFactory;
-        private readonly AppSettings _appSettings;
         private readonly KafkaSettings _kafkaSettings;
-        private readonly IConsumer<string, string> _consumer;
-        private readonly IOptions<KafkaSettings> _kafkaOptions;
         private readonly ILogger<KafkaAntiFraudConsumer> _logger;
 
         public KafkaAntiFraudConsumer(IKafkaProducer kafkaProducer,
@@ -30,10 +27,13 @@ namespace Antifraud.Service.KConsumers
         {
             _kafkaProducer = kafkaProducer ?? throw new ArgumentNullException(nameof(kafkaProducer));
             _scopeFactory = scopeFactory ?? throw new ArgumentNullException(nameof(scopeFactory));
-            _kafkaOptions = kafkaSettings ?? throw new ArgumentNullException(nameof(kafkaSettings));
-            _appSettings = appSettings.Value ?? throw new ArgumentNullException(nameof(appSettings));
             _kafkaSettings = kafkaSettings.Value ?? throw new ArgumentException(nameof(kafkaSettings));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+ 
+        }
+
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
 
             var config = new ConsumerConfig
             {
@@ -42,19 +42,15 @@ namespace Antifraud.Service.KConsumers
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
 
-            _consumer = new ConsumerBuilder<string, string>(config).Build();
-            _consumer.Subscribe(_kafkaSettings.TransactionsTopic);
-
-        }
-
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
+            using var consumer = new ConsumerBuilder<string, string>(config).Build();
+            consumer.Subscribe(_kafkaSettings.TransactionsTopic);
+            _logger.LogInformation($"Suscribed to {_kafkaSettings.TransactionsTopic}");
 
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
-                    var result = _consumer.Consume(stoppingToken);
+                    var result = consumer.Consume(stoppingToken);
 
                     _logger.LogInformation($"Received transaction {result.Message.Value}");
 
@@ -88,7 +84,7 @@ namespace Antifraud.Service.KConsumers
                 }
             }
 
-            _consumer.Close();
+            consumer.Close();
 
         }
     }

@@ -18,4 +18,6 @@ public interface ITransactionService
     /// <param name="transactionEvent">Result related to transaction.</param>
     /// <returns></returns>
     Task<TransactionModel> UpdateTransaction(TransactionResult transactionResult);
+
+    Task<bool> SendMessage();
 }

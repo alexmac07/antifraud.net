@@ -37,7 +37,8 @@ namespace Antifraud.Service.KConsumers
             {
                 BootstrapServers = _kafkaSettings.BootstrapServers,
                 GroupId = _kafkaSettings.GroupId,
-                AutoOffsetReset = AutoOffsetReset.Earliest
+                AutoOffsetReset = AutoOffsetReset.Earliest,
+
             };
 
             using var consumer = new ConsumerBuilder<string, string>(config).Build();
