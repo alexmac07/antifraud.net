@@ -67,7 +67,7 @@ services:
   transaction-api:
     build:
       context: .
-      dockerfile: ./Transaction.Api/Dockerfile
+      dockerfile: ./Transaction.API/Dockerfile
     depends_on:
       - kafka
       - postgres
