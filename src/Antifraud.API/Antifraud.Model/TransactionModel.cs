@@ -31,5 +31,5 @@ public class TransactionModel
     /// <summary>
     /// Creation date
     /// </summary>
-    public DateTime CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 }

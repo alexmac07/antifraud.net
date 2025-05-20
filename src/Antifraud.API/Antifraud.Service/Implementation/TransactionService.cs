@@ -49,9 +49,6 @@ public class TransactionService : ITransactionService
         ValidationResult vResult = await _transactionValidator.ValidateAsync(transaction);
         if (vResult.IsValid)
         {
-            using (TransactionScope tsn = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-            {
-
                 await RegisterTransaction(transaction);
                 var eventInformation = await RegisterEventTransaction(transaction.TransactionId);
 
@@ -60,14 +57,13 @@ public class TransactionService : ITransactionService
                     EventId = eventInformation.EventId,
                     TransactionId = eventInformation.TransactionId,
                 });
-
-                tsn.Complete();
                 return eventInformation;
-            }
+            
 
         }
         throw new ValidationException(vResult.Errors);
     }
+
 
     public async Task<TransactionModel> UpdateTransaction(TransactionResult transactionResult)
     {
@@ -84,6 +80,7 @@ public class TransactionService : ITransactionService
                 if (transactionInformation != null)
                 {
                     transactionInformation.Status = eventInformation.Status;
+                    _logger.LogInformation($"Transaction {transactionInformation.TransactionId} status changed to {transactionInformation.Status}");
                     await _transactionRepository.UpdateTransaction(transactionInformation);
                     return transactionInformation;
                 }
@@ -99,6 +96,18 @@ public class TransactionService : ITransactionService
         }
         throw new ValidationException(vResult.Errors);
     }
+
+
+    public async Task<bool> SendMessage()
+    {
+        await _kafkaProducer.PublishAsync(_kafkaSettings.TransactionsTopic, new TransactionEventKafkaDto
+        {
+            EventId = Guid.NewGuid(),
+            TransactionId = Guid.NewGuid(),
+        });
+        return true;
+    }
+
 
 
     #region .: Private Functions :.

@@ -14,6 +14,15 @@ namespace Antifraud.Service.Implementation
         private readonly ITransactionEventRepository _transactionEventRepository;
         private readonly ILogger<AntifraudService> _logger;
 
+        public AntifraudService(ITransactionRepository transactionRepository,
+                                ITransactionEventRepository transactionEventRepository,
+                                ILogger<AntifraudService> logger)
+        {
+            _transactionRepository = transactionRepository ?? throw new ArgumentNullException(nameof(transactionRepository));
+            _transactionEventRepository = transactionEventRepository ?? throw new ArgumentNullException(nameof(transactionEventRepository));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
         public async Task<TransactionResult> VerifyTransaction(Guid eventId, Guid transactionId)
         {
             TransactionEventModel? eventInformation = new TransactionEventModel();
@@ -36,9 +45,8 @@ namespace Antifraud.Service.Implementation
                 }
 
                 var resultValueCheck = await RuleTransactionValueCheck(transactionId);
-                if (!resultValueCheck.Success)
-                    transactionResult = resultValueCheck;
-
+                transactionResult.Success = resultValueCheck.Success;
+                transactionResult.ErrorMessage = resultValueCheck.ErrorMessage;
                 break;
             }
 
@@ -50,6 +58,8 @@ namespace Antifraud.Service.Implementation
 
                 // save state
                 await _transactionEventRepository.UpdateTransactionEvent(eventInformation);
+
+                _logger.LogInformation($"Event {eventId} status changed to {eventInformation.Status} / Reason: {(eventInformation.Messages ?? "NA")}");
             }
 
             return transactionResult;
@@ -78,10 +88,10 @@ namespace Antifraud.Service.Implementation
                 // Rule 2. Transaction bag sended by origin (approved) cannot exceed sum of 20,000
                 totalTransactionsSum = transactions.Where(x => x.Status == TransactionStatusEnum.Approved
                 &&
-                x.CreatedAt.Date == DateTime.Today)?.Sum(x => x.Value);
+                x.CreatedAt.Date == DateTimeOffset.Now.Date)?.Sum(x => x.Value);
             }
 
-            if (totalTransactionsSum == null || totalTransactionsSum <= 20000)
+            if (totalTransactionsSum == null || totalTransactionsSum < 20000)
                 return TransactionResult.Ok();
             else
                 return TransactionResult.Error(Languages.RejectionMaxTransactionAllowed);

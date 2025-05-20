@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Antifraud.Model\Antifraud.Model.csproj" />
-    <ProjectReference Include="..\Antrifraud.Core.Repository\Antifraud.Core.Repository.csproj" />
+    <ProjectReference Include="..\Antifraud.Core.Repository\Antifraud.Core.Repository.csproj" />
   </ItemGroup>
 
 </Project>

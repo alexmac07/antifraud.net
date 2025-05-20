@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=antifraud
+    volumes:
+    - pgdata:/var/lib/postgresql/data
+    - ./docs/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - app-network    
+  zookeeper:
+    image: confluentinc/cp-zookeeper:5.5.3
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      - app-network    
+  kafka:
+    image: confluentinc/cp-enterprise-kafka:5.5.3
+    depends_on: [zookeeper]
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_BROKER_ID: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_JMX_PORT: 9991
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+    ports:
+      - 9092:9092
+    networks:
+      - app-network
+  create-topics:
+    image: confluentinc/cp-enterprise-kafka:5.5.3
+    depends_on:
+      - kafka
+    volumes:
+      - ./docs/scripts/create-topics.sh:/create-topics.sh
+    entrypoint: ["/bin/sh", "-c"]
+    command: "/create-topics.sh"
+    restart: "no"          
+  antifraud-worker:
+    build:
+      context: .
+      dockerfile: ./Antifraud.Worker/Dockerfile
+    depends_on:
+      - kafka
+      - postgres
+    networks:
+      - app-network
+  transaction-worker:
+    build:
+      context: .
+      dockerfile: ./Transaction.Worker/Dockerfile
+    depends_on:
+      - kafka
+      - postgres
+      - antifraud-worker
+    networks:
+      - app-network      
+  transaction-api:
+    build:
+      context: .
+      dockerfile: ./Transaction.Api/Dockerfile
+    depends_on:
+      - kafka
+      - postgres
+      - antifraud-worker
+      - transaction-worker
+    ports:
+      - "8080:8080"  
+    networks:
+      - app-network      
+volumes:
+  pgdata: 
+networks:
+  app-network:
+    driver: bridge

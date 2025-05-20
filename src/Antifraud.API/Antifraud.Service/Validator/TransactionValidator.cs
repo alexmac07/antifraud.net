@@ -19,7 +19,7 @@ namespace Antifraud.Service.Validator
                 .NotNull().WithMessage(Languages.InvalidTargetAccount);
 
             RuleFor(x => x.Value)
-                .LessThanOrEqualTo(0).WithMessage(Languages.InvalidTransactionAmount);
+                .GreaterThan(0).WithMessage(Languages.InvalidTransactionAmount);
         }
     }
 }

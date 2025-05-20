@@ -9,6 +9,6 @@ namespace Antifraud.Model
         public TransactionStatusEnum Status { get; set; } = TransactionStatusEnum.Pending;
         public bool IsProcessed { get; set; } = false;
         public string? Messages { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
     }
 }
